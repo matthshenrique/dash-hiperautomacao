@@ -1,0 +1,16 @@
+name: check-clean
+on: [push, pull_request]
+jobs:
+  clean-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: bash scripts/check-clean.sh
+      - run: npm ci
+      # config/client.ts é gitignored (gerado do .env no deploy). Para os testes
+      # rodarem no CI, materializa a config genérica de exemplo.
+      - run: cp config/client.example.ts config/client.ts
+      - run: npx vitest run

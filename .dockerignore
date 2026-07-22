@@ -1,0 +1,12 @@
+node_modules
+data
+.git
+*.bak
+docs
+web-dist
+Caddyfile
+litestream.yml
+# NOTA: .env NÃO é ignorado de propósito — o estágio builder precisa dele para
+# rodar gen-config.mjs (gera config/client.ts, que só contém dados NÃO-secretos).
+# Os tokens ficam apenas no estágio builder (descartado); a imagem final não os
+# contém (chegam via env_file em runtime). Build é local na VPS, imagem não é publicada.

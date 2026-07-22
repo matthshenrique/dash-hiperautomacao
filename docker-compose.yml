@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        BUILD_ENV_FILE: .env
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_PATH: /data/app.sqlite
+      PORT: "8787"
+    volumes:
+      - ./data:/data
+    expose:
+      - "8787"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./web-dist:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+  litestream:
+    image: litestream/litestream:0.3
+    restart: unless-stopped
+    profiles: ["backup"]
+    volumes:
+      - ./data:/data
+      - ./litestream.yml:/etc/litestream.yml:ro
+    command: replicate
+
+volumes:
+  caddy_data:
+  caddy_config:

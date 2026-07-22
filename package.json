@@ -1,0 +1,42 @@
+{
+  "name": "dashboard-comercial",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:web": "vite build -c web/vite.config.ts",
+    "test": "vitest run",
+    "test:web": "vitest run -c web/vitest.config.ts",
+    "start": "tsx src/server.ts",
+    "gen:config": "node scripts/gen-config.mjs",
+    "discover": "node scripts/discover.mjs",
+    "autoconfig": "node scripts/autoconfig.mjs",
+    "check:clean": "bash scripts/check-clean.sh",
+    "cf:deploy": "npm run gen:config && npm run build:web && wrangler deploy",
+    "cf:db:create": "wrangler d1 create dashboard-db",
+    "cf:db:migrate": "wrangler d1 migrations apply dashboard-db --remote"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.11",
+    "better-sqlite3": "^11.10.0",
+    "hono": "^4.6.0",
+    "node-cron": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.0",
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^26.1.1",
+    "@types/node-cron": "^3.0.11",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "recharts": "^2.13.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0",
+    "wrangler": "^3.90.0"
+  }
+}

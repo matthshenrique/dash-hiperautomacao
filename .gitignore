@@ -1,0 +1,9 @@
+node_modules/
+.dev.vars
+.wrangler/
+dist/
+wrangler.toml
+.env
+.env.local
+data/
+config/client.ts

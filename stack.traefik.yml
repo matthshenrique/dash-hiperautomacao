@@ -1,0 +1,45 @@
+# Modo VPS compartilhada com Traefik (Docker Swarm).
+# NÃO usa o Caddy do stack — o Traefik já existente faz proxy + TLS.
+# O container `app` serve API + front (ver src/server.ts) na porta interna 8787.
+#
+# Deploy: use ./deploy-traefik.sh (builda a imagem e sobe o stack, injetando o .env).
+# A rede, o entrypoint e o certresolver do Traefik vêm do .env (TRAEFIK_NETWORK,
+# TRAEFIK_ENTRYPOINT, TRAEFIK_CERTRESOLVER) — ajuste-os para os do seu Traefik.
+version: "3.8"
+
+services:
+  app:
+    image: dashboard-hiperautomacao:local
+    environment:
+      DB_PATH: /data/app.sqlite
+      PORT: "8787"
+      # secrets — interpolados do .env carregado no deploy (Swarm ignora env_file)
+      KOMMO_TOKEN: ${KOMMO_TOKEN}
+      META_TOKEN: ${META_TOKEN}
+      DASH_KEY: ${DASH_KEY}
+      EVOLUTION_URL: ${EVOLUTION_URL:-}
+      EVOLUTION_KEY: ${EVOLUTION_KEY:-}
+      ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-}
+    volumes:
+      - dashboard_data:/data
+    networks:
+      - traefik
+    deploy:
+      replicas: 1 # 1 réplica: os crons rodam dentro do processo; evita sync em dobro
+      restart_policy:
+        condition: any # Swarm: none | on-failure | any (reinicia sempre)
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+        - "traefik.http.routers.dashboard.rule=Host(`${DASH_DOMAIN}`)"
+        - "traefik.http.routers.dashboard.entrypoints=${TRAEFIK_ENTRYPOINT}"
+        - "traefik.http.routers.dashboard.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+        - "traefik.http.services.dashboard.loadbalancer.server.port=8787"
+
+volumes:
+  dashboard_data:
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}

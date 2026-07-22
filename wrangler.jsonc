@@ -1,0 +1,20 @@
+{
+  // Alvo Cloudflare Workers. Para VPS/Docker este arquivo é ignorado.
+  // Veja DEPLOY-CLOUDFLARE.md para o passo a passo.
+  "name": "dashboard-comercial",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "./web/dist", "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dashboard-db",
+      // PREENCHA com o id retornado por `npx wrangler d1 create dashboard-db`
+      "database_id": "PREENCHA_SEU_DATABASE_ID"
+    }
+  ],
+  "triggers": {
+    "crons": ["*/15 * * * *", "0 */2 * * *"]
+  }
+}
